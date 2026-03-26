@@ -12,6 +12,11 @@ venv/
 
 # Environment
 .env
+.env.local
+.env.*.local
+
+# Claude Code (machine-specific permissions)
+.claude/
 
 # IDE
 .vscode/
