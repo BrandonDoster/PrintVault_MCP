@@ -26,7 +26,7 @@ src/print_vault_mcp/
   __main__.py      # python -m support
   client.py        # PrintVaultClient — async httpx wrapper (GET/POST/PATCH/DELETE)
   formatters.py    # Functions that turn API JSON into concise text for AI consumption
-  server.py        # FastMCP server instance + all 38 tool definitions
+  server.py        # FastMCP server instance + all 40 tool definitions
 ```
 
 ## Architecture patterns
@@ -46,4 +46,4 @@ src/print_vault_mcp/
 
 ## Reference files
 
-Print Vault API contract source extracts live in `docs/reference/` (urls.py, views.py, serializers.py). Consult these when adding new tools.
+The Print Vault API contract is documented in `docs/reference/API_CONTRACT.md` with links to the upstream source files in the [Print Vault repo](https://github.com/shaxs/print-vault). Consult these when adding new tools. We do not keep copies of Print Vault source code — only references.

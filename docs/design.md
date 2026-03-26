@@ -274,7 +274,8 @@ Key models and their relationships, extracted from `inventory/models.py`. Unders
 
 **Phase 2 — Write Operations**
 - Inventory writes: `add_inventory_item`, `update_inventory_item`
-- Filament writes: `add_filament_spool`, `update_spool_weight`, `mark_spool_empty`, `open_spool`, `archive_spools`, `toggle_material_favorite`
+- Material writes: `create_material` (generic types + specific blueprints)
+- Filament writes: `add_filament_spool` (blueprint-based), `quick_add_spool` (standalone), `update_spool_weight`, `mark_spool_empty`, `open_spool`, `archive_spools`, `toggle_material_favorite`
 - Printer writes: `update_printer`, `add_mod`, `update_mod`
 - Project writes: `create_project`, `update_project`, `add_bom_item`, `link_printer_to_project`
 
@@ -282,7 +283,7 @@ Key models and their relationships, extracted from `inventory/models.py`. Unders
 - Tracker: `create_tracker_from_github`, `update_file_status`
 - Alerts: `dismiss_alert`
 
-**Total: 38 tools registered and verified.**
+**Total: 40 tools registered and verified.**
 
 ### Remaining (Future)
 
@@ -340,13 +341,7 @@ claude mcp add print-vault \
 
 ## Reference Source Files
 
-Extracts from the Print Vault repository that define the complete API contract are stored in `docs/reference/`. These were used during initial development and remain useful for adding new tools.
-
-| File | Contains |
-|------|----------|
-| `docs/reference/urls.py` | Complete route map — all `router.register()` calls and standalone URL patterns |
-| `docs/reference/views.py` | All ViewSets, custom `@action` endpoints, request/response shapes, query logic |
-| `docs/reference/serializers.py` | All DRF serializers — exact JSON field names, validation, nested objects |
+The Print Vault API contract is documented in [`docs/reference/API_CONTRACT.md`](reference/API_CONTRACT.md) with links to the upstream source files in the [Print Vault repository](https://github.com/shaxs/print-vault). We do not keep copies of Print Vault source code in this repo to avoid license entanglement (Print Vault is AGPL-3.0).
 
 ---
 

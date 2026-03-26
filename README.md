@@ -67,7 +67,7 @@ claude mcp add print-vault \
 
 ## Tools
 
-38 tools organized across 7 groups:
+40 tools organized across 7 groups:
 
 ### Dashboard & System
 
@@ -93,9 +93,11 @@ claude mcp add print-vault \
 | Tool | Description |
 |------|-------------|
 | `list_materials` | Browse material blueprints and generic types |
+| `create_material` | Create a generic material type or specific blueprint |
 | `get_material_spools` | List physical spools for a material blueprint |
 | `list_spools` | Browse spools with status/printer/color filters |
 | `add_filament_spool` | Add new spool(s) linked to a material blueprint |
+| `quick_add_spool` | Quick-add a spool without a blueprint (standalone fields) |
 | `update_spool_weight` | Update current weight (auto-updates status) |
 | `mark_spool_empty` | Mark a spool as empty |
 | `open_spool` | Open a spool from an unopened batch |
@@ -156,7 +158,7 @@ PrintVaultMCP/
 │   └── server.py            # MCP server & tool definitions
 ├── docs/
 │   ├── design.md            # Architecture & design document
-│   └── reference/           # Print Vault source extracts (API contract)
+│   └── reference/           # API contract references (links to upstream source)
 ├── .env.example             # Environment variable template
 ├── .gitignore
 ├── pyproject.toml           # uv/pip package configuration
@@ -194,4 +196,4 @@ Print Vault uses `AllowAny` permissions on every endpoint (single-user self-host
 
 ## License
 
-MIT
+[AGPL-3.0](LICENSE) — same license family as [Print Vault](https://github.com/shaxs/print-vault) itself.

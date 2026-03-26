@@ -3,6 +3,7 @@ name = "print-vault-mcp"
 version = "0.1.0"
 description = "MCP server for Print Vault — AI-powered 3D printing inventory management"
 readme = "README.md"
+license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
 dependencies = [
     "mcp>=1.0.0",
