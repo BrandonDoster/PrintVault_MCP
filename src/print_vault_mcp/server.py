@@ -1038,8 +1038,17 @@ async def create_tracker_from_github(github_url: str) -> str:
         )
         if data.get("success") is False:
             return f"GitHub crawl failed: {data.get('error', 'unknown error')}"
-        files = data.get("files", [])
-        return f"Found {len(files)} printable file(s) from {github_url}."
+        file_tree = data.get("file_tree", [])
+        total_files = sum(len(d.get("files", [])) for d in file_tree)
+        stats = data.get("stats", {})
+        dirs = [d["directory_path"] or "(root)" for d in file_tree]
+        summary = f"Found {total_files} printable file(s) from {github_url}."
+        if stats:
+            summary += f"\n  Size: {stats.get('total_size_mb', '?')} MB"
+            summary += f"\n  Types: {stats.get('file_types', {})}"
+        if dirs:
+            summary += f"\n  Directories: {', '.join(dirs)}"
+        return summary
     except Exception as e:
         return _err(e)
 
