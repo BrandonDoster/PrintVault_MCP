@@ -332,6 +332,99 @@ async def get_material_spools(material_id: int) -> str:
 
 
 @mcp.tool()
+async def create_material(
+    name: str,
+    is_generic: bool = False,
+    brand: str | None = None,
+    base_material_id: int | None = None,
+    colors: list[str] | None = None,
+    color_family: str | None = None,
+    diameter: float | None = None,
+    spool_weight: int | None = None,
+    empty_spool_weight: int | None = None,
+    nozzle_temp_min: int | None = None,
+    nozzle_temp_max: int | None = None,
+    bed_temp_min: int | None = None,
+    bed_temp_max: int | None = None,
+    density: float | None = None,
+    price_per_spool: float | None = None,
+    vendor: str | None = None,
+    vendor_link: str | None = None,
+    notes: str | None = None,
+    features: list[str] | None = None,
+) -> str:
+    """Create a new material — either a generic type (e.g. 'PLA') or a specific blueprint (e.g. 'Sunlu PLA+ Black').
+
+    A generic material is a base type that blueprints reference. A blueprint is a specific
+    brand/color combination that spools are linked to. Create a generic first, then blueprints
+    that reference it via base_material_id.
+
+    Args:
+        name: Material name (e.g. 'PLA' for generic, 'Sunlu PLA+ Black' for blueprint).
+        is_generic: True for a generic base material, False for a specific blueprint.
+        brand: Brand name for blueprints (will be created if new). Ignored for generics.
+        base_material_id: ID of a generic material this blueprint is based on.
+        colors: List of color names (e.g. ['Black'] or ['Black', 'Red'] for multicolor).
+        color_family: Color family for grouping (e.g. 'Black', 'Red', 'Neutral').
+        diameter: Filament diameter in mm (default 1.75).
+        spool_weight: Net filament weight per spool in grams (default 1000).
+        empty_spool_weight: Empty spool weight in grams.
+        nozzle_temp_min: Minimum nozzle temperature in Celsius.
+        nozzle_temp_max: Maximum nozzle temperature in Celsius.
+        bed_temp_min: Minimum bed temperature in Celsius.
+        bed_temp_max: Maximum bed temperature in Celsius.
+        density: Filament density in g/cm3 (e.g. 1.24 for PLA).
+        price_per_spool: Price per spool.
+        vendor: Vendor name (will be created if new).
+        vendor_link: URL to vendor product page.
+        notes: Free-text notes.
+        features: List of feature names (e.g. ['Matte', 'High Speed']). Created if new.
+    """
+    try:
+        payload: dict = {"name": name, "is_generic": is_generic}
+        if brand:
+            payload["brand"] = {"name": brand}
+        if base_material_id is not None:
+            payload["base_material_id"] = base_material_id
+        if colors is not None:
+            payload["colors"] = colors
+        if color_family:
+            payload["color_family"] = color_family
+        if diameter is not None:
+            payload["diameter"] = diameter
+        if spool_weight is not None:
+            payload["spool_weight"] = spool_weight
+        if empty_spool_weight is not None:
+            payload["empty_spool_weight"] = empty_spool_weight
+        if nozzle_temp_min is not None:
+            payload["nozzle_temp_min"] = nozzle_temp_min
+        if nozzle_temp_max is not None:
+            payload["nozzle_temp_max"] = nozzle_temp_max
+        if bed_temp_min is not None:
+            payload["bed_temp_min"] = bed_temp_min
+        if bed_temp_max is not None:
+            payload["bed_temp_max"] = bed_temp_max
+        if density is not None:
+            payload["density"] = density
+        if price_per_spool is not None:
+            payload["price_per_spool"] = price_per_spool
+        if vendor:
+            payload["vendor"] = {"name": vendor}
+        if vendor_link:
+            payload["vendor_link"] = vendor_link
+        if notes:
+            payload["notes"] = notes
+        if features:
+            payload["features"] = [{"name": f} for f in features]
+
+        data = await _get_client().post("/api/materials/", json=payload)
+        kind = "generic material" if data.get("is_generic") else "material blueprint"
+        return f"Created {kind} #{data['id']}: {data['name']}"
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool()
 async def list_spools(
     status: str | None = None,
     printer: int | None = None,
@@ -397,6 +490,82 @@ async def add_filament_spool(
 
         data = await _get_client().post("/api/filament-spools/", json=payload)
         return f"Created spool #{data['id']} (qty: {data.get('quantity', 1)})"
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool()
+async def quick_add_spool(
+    standalone_name: str,
+    quantity: int = 1,
+    initial_weight: int = 1000,
+    standalone_brand: str | None = None,
+    standalone_material_type_id: int | None = None,
+    standalone_colors: list[str] | None = None,
+    standalone_color_family: str | None = None,
+    location: str | None = None,
+    notes: str | None = None,
+    price_paid: float | None = None,
+    standalone_nozzle_temp_min: int | None = None,
+    standalone_nozzle_temp_max: int | None = None,
+    standalone_bed_temp_min: int | None = None,
+    standalone_bed_temp_max: int | None = None,
+    standalone_density: float | None = None,
+) -> str:
+    """Quick-add a filament spool without a material blueprint. Use this when you just want to track a spool without setting up a full material blueprint first.
+
+    Args:
+        standalone_name: Name for this spool (e.g. 'eSun PLA+ Black').
+        quantity: Number of identical spools to add (default 1).
+        initial_weight: Net filament weight in grams (default 1000g / 1kg).
+        standalone_brand: Brand name (will be created if new).
+        standalone_material_type_id: ID of a generic material type (e.g. PLA, PETG). Use list_materials with material_type='generic' to find IDs.
+        standalone_colors: List of color names (e.g. ['Black']).
+        standalone_color_family: Color family for grouping (e.g. 'Black', 'Red').
+        location: Storage location name (will be created if new).
+        notes: Free-text notes.
+        price_paid: Price paid for this spool.
+        standalone_nozzle_temp_min: Min nozzle temp in Celsius.
+        standalone_nozzle_temp_max: Max nozzle temp in Celsius.
+        standalone_bed_temp_min: Min bed temp in Celsius.
+        standalone_bed_temp_max: Max bed temp in Celsius.
+        standalone_density: Filament density in g/cm3.
+    """
+    try:
+        payload: dict = {
+            "is_quick_add": True,
+            "standalone_name": standalone_name,
+            "quantity": quantity,
+            "initial_weight": initial_weight,
+            "current_weight": initial_weight,
+        }
+        if standalone_brand:
+            payload["standalone_brand"] = {"name": standalone_brand}
+        if standalone_material_type_id is not None:
+            payload["standalone_material_type_id"] = standalone_material_type_id
+        if standalone_colors is not None:
+            payload["standalone_colors"] = standalone_colors
+        if standalone_color_family:
+            payload["standalone_color_family"] = standalone_color_family
+        if location:
+            payload["location"] = {"name": location}
+        if notes:
+            payload["notes"] = notes
+        if price_paid is not None:
+            payload["price_paid"] = price_paid
+        if standalone_nozzle_temp_min is not None:
+            payload["standalone_nozzle_temp_min"] = standalone_nozzle_temp_min
+        if standalone_nozzle_temp_max is not None:
+            payload["standalone_nozzle_temp_max"] = standalone_nozzle_temp_max
+        if standalone_bed_temp_min is not None:
+            payload["standalone_bed_temp_min"] = standalone_bed_temp_min
+        if standalone_bed_temp_max is not None:
+            payload["standalone_bed_temp_max"] = standalone_bed_temp_max
+        if standalone_density is not None:
+            payload["standalone_density"] = standalone_density
+
+        data = await _get_client().post("/api/filament-spools/", json=payload)
+        return f"Quick-added spool #{data['id']}: {standalone_name} (qty: {data.get('quantity', 1)})"
     except Exception as e:
         return _err(e)
 
